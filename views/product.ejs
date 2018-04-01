@@ -1,20 +1,34 @@
 <%- include('./partials/header') %>
 <div class="container">
   <div class="row">
-    <div class="col-12 text-center p-4">
-      <img src="/images/stripe.png" alt="" style="max-width:100%;margin-left:-20px;">
+    <div class="col-12 col-md-5">
+
+    </div>
+    <div class="col-12 col-md-7 text-center p-4">
+      <img src="/images/stripe.png" class="mw-100">
     </div>
   </div>
   <div class="row align-items-stretch">
     <div class="col-12 col-md-5 d-flex align-items-stretch">
     <div class="card w-100">
       <div class="card-body">
-        <h5 class="card-title">Récapitulatif de votre commande</h5>
-        <div>
-          Produit : <%= product.name %>
+        <h5 class="card-title"><%= _t('Order Summary') %></h5>
+        <div class="text-center">
+          <% if (product.image) { %>
+            <img src="<%= product.image %>" alt="">
+          <% } %>
         </div>
-        <div>
-          Prix : <%= product.price %>€
+        <div class="">
+          <%= _t('Product : ') %>
+          <strong><%= product.name %></strong>
+        </div>
+        <div class="">
+          <%= _t('Price : ') %>
+          <strong><%= product.price %>€</strong>
+        </div>
+        <div class="">
+          <%= _t('Customer service : ') %>
+          <strong><%= config.contactEmail %></strong>
         </div>
       </div>
     </div>
@@ -22,28 +36,34 @@
     <div class="col-12 col-md-7">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Paiement par carte banquaire</h5>
+          <h5 class="card-title"><%= _t('Pay with card') %></h5>
           <div>
             <!-- <img src="/images/stripe.png" alt="" style="max-width:100%;margin-left:-20px;"> -->
           </div>
-          <form action="/charge" method="post" id="payment-form">
+          <form action="/order" method="post" id="payment-form">
             <input type="hidden" name="product" value="<%= product.id %>">
             <div class="form-group">
-              <label for="email">Adresse email</label>
+              <label for="email">
+                <%= _t('Email address') %>
+              </label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <div class="input-group-text"><i class="fa fa-envelope"></i></div>
                 </div>
                 <input type="email" name="email" class="form-control">
               </div>
-              <small id="emailHelp" class="form-text text-muted">Votre commande sera envoyée à cette addresse email.</small>
+              <small id="emailHelp" class="form-text text-muted">
+                <%= _t('Your products will be sent to this email address') %>
+              </small>
             </div>
             <div id="card-errors" role="alert"></div>
             <div class="row">
               <div class="col-12 col-md-6">
                 <div class="form-group">
                   <!-- Used to display Element errors. -->
-                  <label for="card-element"><!-- <i class="fa fa-credit-card"></i> -->Numéro de carte</label>
+                  <label for="card-element"><!-- <i class="fa fa-credit-card"></i> -->
+                    <%= _t('Card number') %>
+                  </label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text">
@@ -55,7 +75,6 @@
                       </div>
 
                   </div>
-                  <!-- <small id="cvcHelp" class="form-text text-muted">Paiement sécurisé par la plteforme stripe</small> -->
                 </div>
               </div>
               <div class="col-12 col-md-6 d-flex align-items-center text-center justify-content-center">
@@ -63,7 +82,9 @@
                   <i style="font-size: 3rem;" class="p-1 fa fa-cc-stripe"></i>
                   <i style="font-size: 3rem;" class="p-1 fa fa-cc-visa"></i>
                   <i style="font-size: 3rem;" class="p-1 fa fa-cc-mastercard"></i>
-                  <small class="form-text text-muted" for="">Paiement sécurisé par Stripe</small>
+                  <small class="form-text text-muted" for="">
+                    <%= _t('Payment secured by Stripe') %>
+                  </small>
                 </div>
               </div>
             </div>
@@ -71,7 +92,9 @@
               <div class="col">
                 <div class="form-group">
                   <!-- Used to display Element errors. -->
-                  <label for="expiry-element">Date d'expiration</label>
+                  <label for="expiry-element">
+                    <%= _t('Expiry date') %>
+                  </label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text"><i class="fa fa-calendar"></i></div>
@@ -86,7 +109,9 @@
               <div class="col">
                 <div class="form-group">
                   <!-- Used to display Element errors. -->
-                  <label for="cv-element">Numero de contrôle</label>
+                  <label for="cv-element">
+                    <%= _t('CVC Number') %>
+                  </label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text"><i class="fa fa-lock"></i></div>
@@ -96,13 +121,17 @@
                     </div>
 
                   </div>
-                  <small id="cvcHelp" class="form-text text-muted">Il s'agit du numéro à 3 chiffres situé au dos de votre carte</small>
+                  <small id="cvcHelp" class="form-text text-muted">
+                    <%= _t('This is the 3 digit number at the back of your card') %>
+                  </small>
                 </div>
               </div>
             </div>
 
             <div class="text-right">
-              <button class="btn btn-success">Commander</button>
+              <button class="btn btn-success">
+                <%= _t('Order') %>
+              </button>
             </div>
           </form>
         </div>

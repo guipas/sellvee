@@ -8,130 +8,111 @@ const crypto = require('crypto');
 const util = require('util');
 const randomBytes = util.promisify(crypto.randomBytes);
 const router = express.Router();
-// Set your secret key: remember to change this to your live secret key in production
-// See your keys here: https://dashboard.stripe.com/account/apikeys
-const secretKey = `sk_test_0poc1Q6Xa4z8svfECCNOiyP2`;
-const publicKey  = `pk_test_3dt3dTXVME1yLzZQPctBtV1S`;
-const stripe = require("stripe")(secretKey);
-
-const config = require('../config');
-const products = require('../products');
 const storage = require('../lib/storage');
-const mailer = require('../lib/mailer');
+const am = require('../lib/asyncMiddleware');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
 
-router.get(`/product/:slug`, (req, res, next) => {
-  const product = _.find(products, { slug : req.params.slug });
-  if (!product) { return next(); }
+module.exports = config => {
+  const stripe = require("stripe")(config.stripe.secretKey);// eslint-disable-line
+  const log = (...args) => config.log === true ? console.log(...args) : null;// eslint-disable-line
+  const mailer = require('../lib/mailer')(config);// eslint-disable-line
 
-  return res.render('product', {
-    product,
-    publicKey
+  router.get(`/product/:slug`, (req, res, next) => {
+    const product = _.find(config.products, { slug : req.params.slug });
+    if (!product) { return next(); }
+
+    return res.render('product', {
+      product,
+      publicKey : config.stripe.publicKey,
+    });
   });
-});
 
-router.post('/charge', (req, res, next) => {
+  router.post('/order', am(async (req, res, next) => {
 
-  console.log(`products : `, products);
-  console.log(`body : `, req.body);
+    // Token is created using Checkout or Elements!
+    // Get the payment token ID submitted by the form:
+    const stripeToken = req.body.stripeToken; // Using Express
+    const product = _.find(config.products, { id : req.body.product });
+    const email = req.body.email;
+    log(`Ordering product : `, product);
 
-  // Token is created using Checkout or Elements!
-  // Get the payment token ID submitted by the form:
-  const token = req.body.stripeToken; // Using Express
-  const product = _.find(products, { id : req.body.product });
-  const email = req.body.email;
-  console.log(`charging for product : `, product);
+    const currency = product.currency ? product.currency : config.currency;
 
+    log(`Currency : `, currency);
 
-  const currency = product.currency ? product.currency : config.currency;
-
-  console.log(`currency : `, currency);
-
-  if (!product) {
-    return next('Product Not found');
-  }
-
-  // Charge the user's card:
-  stripe.charges.create({
-    amount: parseInt(product.price * 100, 10), // stripe amounts are in cents
-    description: `${product.name} - ${config.name}`,
-    source: token,
-    currency,
-  }, (err, charge) => {
-    if (err) {
-      return next(err);
+    if (!product) {
+      log(`Product not found`);
+      return next('Product Not found');
     }
-    console.log('charge : ', charge);
 
-    return randomBytes(48)
-    .catch(err => {
-      return next(err);
-    })
-    .then(buffer => buffer.toString('hex'))
-    .then(token => {
-      console.log(`Generated token : `, token);
-      const id = uuid.v4();
+    const charge = await new Promise((resolve, reject) => {
+      stripe.charges.create({
+        amount: parseInt(product.price * 100, 10), // stripe amounts are in cents
+        description: `${product.name} - ${config.name}`,
+        source: stripeToken,
+        currency,
+      }, (err, charge) => {
+        if (err) return reject(err);
 
-      return storage.setItem(`order:${id}`, {
-        id,
-        charge,
-        token,
-        nbAccess : 0,
-        productId : product.id,
-        createdAt : moment().toISOString(),
-        email,
+        return resolve(charge);
       });
-    })
-    .then(items => {
-      console.log('persisted items :', items);
-      const item = Array.isArray(items) ? items[0].value : items;
-      console.log('item :', item);
-      const link = `${config.url}/download/${item.id}/${item.token}`;
-      return mailer.sendMail({
-        from: config.fromEmail,
-        to: email,
-        subject: `Votre commande sur ${config.name}`, // Subject line
-        text: `Thanks for your order, you can download it here : ${link}`, // plain text body
-        html: `Thanks for your order, you can download it here : <a href="${link}"></a>`, // html body
-      })
-      .then(() => {
-        res.send(`Your order has been processed`);
-      });
-    })
-    .catch(err => {
-      next(err);
-    })
-  });
-});
+    });
 
+    log(`Generating download token...`);
+    const randomBytesBuffer = await randomBytes(48);
+    const downloadToken = randomBytesBuffer.toString('hex');
+    const id = uuid.v4();
 
-router.get('/download/:order/:token', (req, res, next) => {
-  const id = req.params.order;
-  const token = req.params.token;
-  const key = `order:${id}`;
+    log(`Saving order`);
+    await storage.setItem(`order:${id}`, {
+      id,
+      charge,
+      token : downloadToken,
+      nbAccess : 0,
+      productId : product.id,
+      createdAt : moment().toISOString(),
+      email,
+    });
 
-  if (!token || !id) { return next(); }
+    log(`Generating link...`);
+    const link = `${config.url}/download/${id}/${downloadToken}`;
 
-  return storage.getItem(key)
-  .then(order => {
+    log('Sending email...');
+    await mailer.sendMail({
+      from: config.emails.from,
+      to: email,
+      subject: typeof config.emails.templates.order.subject === `function` ? config.emails.templates.order.subject({ link }) :  config.emails.templates.order.subject,
+      html: typeof config.emails.templates.order.htmlBody === `function` ?   config.emails.templates.order.htmlBody({ link }) : config.emails.templates.order.htmlBody,
+      text: typeof config.emails.templates.order.textBody === `function` ?   config.emails.templates.order.textBody({ link }) : config.emails.templates.order.textBody,
+    });
+
+    res.render('success');
+  }));
+
+  router.get('/download/:order/:token', am(async (req, res, next) => {
+    log(`Download attempt...`);
+    const id = req.params.order;
+    const token = req.params.token;
+    if (!token || !id) { return next(); }
+
+    const key = `order:${id}`;
+    const order = await storage.getItem(key);
     if (!order) { return next(); }
 
-    console.log('Found order : ', order);
+    log('Found order : ', order.id);
 
     order.nbAccess += 1;
 
     if (order.token !== token) {
-      return storage.setItem(key, order).then(() => next());
+      await storage.setItem(key, order);
+      return next();
     }
 
-    const product = _.find(products, { id : order.productId });
+    const product = _.find(config.products, { id : order.productId });
 
     if (!product) {
-      return storage.setItem(key, order).then(() => next('Sorry, this product does not exist anymore'));
+      await storage.setItem(key, order);
+      return next('Sorry, this product does not exist anymore');
     }
 
     const maxDownloads = product.maxDownloads ? product.maxDownloads : config.maxDownloads;
@@ -139,16 +120,19 @@ router.get('/download/:order/:token', (req, res, next) => {
     const createdAt = moment(product.createdAt);
     const expiredAt = createdAt.clone().add(maxDownloadDelay, `seconds`);
 
-    console.log(`downmoads : `, order.nbAccess, '/', maxDownloads);
-    console.log(`max delay : `, maxDownloadDelay);
+    log(`Downloads : `, order.nbAccess, '/', maxDownloads);
+    log(`Max delay : `, maxDownloadDelay);
     if (order.nbAccess > maxDownloads || moment().isAfter(expiredAt)) {
-      return storage.setItem(key, order).then(() => next());
+      await storage.setItem(key, order);
+      return next();
     }
 
-    return storage.setItem(key, order).then(() => res.sendFile(product.file));
-  })
-  .catch(err => next());
-});
+    await storage.setItem(key, order);
 
+    log(`Download autorization granted, sending file...`);
+    return res.sendFile(product.file);
+  }));
 
-module.exports = router;
+  return router;
+};
+

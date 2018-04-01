@@ -1,15 +1,16 @@
 {
   "name": "sellvee",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
     "start": "node ./bin/www"
   },
+  "main": "app.js",
   "dependencies": {
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
-    "ejs": "~2.5.7",
+    "deepmerge": "^2.1.0",
+    "ejs": "^2.5.7",
     "express": "~4.15.5",
     "lodash": "^4.17.5",
     "moment": "^2.21.0",
