@@ -14,4 +14,5 @@ module.exports = {
   'Product : ' : "Produit: ",
   'Price : ' : "Prix: ",
   'Customer service : ' : "Service client: ",
+  'Please wait...' : "Veuillez patienter",
 };

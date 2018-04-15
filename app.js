@@ -19,10 +19,15 @@ const app = express();
 module.exports = (userConfig = {}) => {
   const config = merge(defaultConfig, userConfig);
 
+  app.set(`env`, config.env);
+
   // view engine setup
   app.set('views', path.join(__dirname, 'views'));
   if (config.views) {
-    app.set('views', config.views);
+    app.set('views', [
+      config.views,
+      path.join(__dirname, 'views'),
+    ]);
   }
   app.set('view engine', 'ejs');
 
@@ -60,7 +65,7 @@ module.exports = (userConfig = {}) => {
     });
 
     // error handler
-    app.use((err, req, res) => {
+    app.use((err, req, res, next) => {
       // set locals, only providing error in development
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};

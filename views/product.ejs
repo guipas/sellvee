@@ -1,39 +1,43 @@
 <%- include('./partials/header') %>
 <div class="container">
-  <div class="row">
-    <div class="col-12 col-md-5">
-
-    </div>
-    <div class="col-12 col-md-7 text-center p-4">
+  <div class="row justify-content-center mt-2">
+    <div class="col-8 col-md-6 text-center">
       <img src="/images/stripe.png" class="mw-100">
     </div>
   </div>
-  <div class="row align-items-stretch">
-    <div class="col-12 col-md-5 d-flex align-items-stretch">
-    <div class="card w-100">
-      <div class="card-body">
-        <h5 class="card-title"><%= _t('Order Summary') %></h5>
-        <div class="text-center">
-          <% if (product.image) { %>
-            <img src="<%= product.image %>" alt="">
-          <% } %>
-        </div>
-        <div class="">
-          <%= _t('Product : ') %>
-          <strong><%= product.name %></strong>
-        </div>
-        <div class="">
-          <%= _t('Price : ') %>
-          <strong><%= product.price %>€</strong>
-        </div>
-        <div class="">
-          <%= _t('Customer service : ') %>
-          <strong><%= config.contactEmail %></strong>
+  <div class="row justify-content-center mt-3">
+    <div class="col-12 col-md-8">
+    <div class="card">
+      <div class="card-body p-1">
+        <div class="row align-items-center">
+          <div class="col-6">
+            <div class="text-center">
+              <% if (product.image) { %>
+                <img src="<%= product.image %>" alt="" style="max-width: 240px;">
+              <% } %>
+            </div>
+          </div>
+          <div class="col-6">
+            <h5 class="card-title"><%= _t('Order Summary') %></h5>
+            <div class="">
+              <%= _t('Product : ') %>
+              <strong><%= product.name %></strong>
+            </div>
+            <div class="">
+              <%= _t('Price : ') %>
+              <strong><%= product.price %>€</strong>
+            </div>
+            <div class="">
+              <br>
+              <%= _t('Customer service : ') %>
+              <strong><%= config.contactEmail %></strong>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     </div>
-    <div class="col-12 col-md-7">
+    <div class="col-12 col-md-8 mt-3 mb-5 pb-5">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title"><%= _t('Pay with card') %></h5>
@@ -43,7 +47,7 @@
           <form action="/order" method="post" id="payment-form">
             <input type="hidden" name="product" value="<%= product.id %>">
             <div class="form-group">
-              <label for="email">
+              <label for="email" class="">
                 <%= _t('Email address') %>
               </label>
               <div class="input-group">
@@ -56,10 +60,12 @@
                 <%= _t('Your products will be sent to this email address') %>
               </small>
             </div>
-            <div id="card-errors" role="alert"></div>
+            <div id="card-errors" class="d-none" role="alert"></div>
             <div class="row">
-              <div class="col-12 col-md-6">
-                <div class="form-group">
+
+
+              <div class="col-12 col-lg-6">
+                <div class="form-group mb-lg-0">
                   <!-- Used to display Element errors. -->
                   <label for="card-element"><!-- <i class="fa fa-credit-card"></i> -->
                     <%= _t('Card number') %>
@@ -73,41 +79,12 @@
                       <div id="card-element">
                         <!-- A Stripe Element will be inserted here. -->
                       </div>
-
                   </div>
                 </div>
               </div>
-              <div class="col-12 col-md-6 d-flex align-items-center text-center justify-content-center">
-                <div class="form-group">
-                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-stripe"></i>
-                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-visa"></i>
-                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-mastercard"></i>
-                  <small class="form-text text-muted" for="">
-                    <%= _t('Payment secured by Stripe') %>
-                  </small>
-                </div>
-              </div>
-            </div>
-            <div class="row mt-2">
-              <div class="col">
-                <div class="form-group">
-                  <!-- Used to display Element errors. -->
-                  <label for="expiry-element">
-                    <%= _t('Expiry date') %>
-                  </label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                    </div>
-                    <div id="expiry-element">
-                      <!-- A Stripe Element will be inserted here. -->
-                    </div>
 
-                  </div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
+              <div class="col-12 col-sm-6">
+                <div class="form-group mb-lg-0">
                   <!-- Used to display Element errors. -->
                   <label for="cv-element">
                     <%= _t('CVC Number') %>
@@ -126,13 +103,54 @@
                   </small>
                 </div>
               </div>
+
+              <div class="col-12 col-sm-6">
+                <div class="form-group">
+                  <!-- Used to display Element errors. -->
+                  <label for="expiry-element">
+                    <%= _t('Expiry date') %>
+                  </label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                    <div id="expiry-element">
+                      <!-- A Stripe Element will be inserted here. -->
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="col-12 mt-5">
+              </div>
+
+
+              <div class="col-12 col-md-6 d-none d-lg-flex align-items-center text-center justify-content-center text-muted">
+                <div class="form-group m-0">
+                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-stripe"></i>
+                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-visa"></i>
+                  <i style="font-size: 3rem;" class="p-1 fa fa-cc-mastercard"></i>
+                  <small class="form-text text-muted" for="">
+                    <%= _t('Payment secured by Stripe') %>
+                  </small>
+                </div>
+              </div>
+              <div class="col-12 col-lg-6 text-center text-md-right d-flex align-items-center justify-content-center mb-4 flex-wrap">
+
+                <button id="order-button" class="btn btn-success btn-lg">
+                  <%= _t('Order') %>
+                </button>
+                <div class="w-100 text-center pt-1 small d-block d-lg-none text-muted">
+                  <%= _t('Payment secured by Stripe') %> <br/>
+                  <i style="font-size: 2.3rem;" class="p-1 fa fa-cc-amex"></i>
+                  <i style="font-size: 2.3rem;" class="p-1 fa fa-cc-visa"></i>
+                  <i style="font-size: 2.3rem;" class="p-1 fa fa-cc-mastercard"></i>
+                </div>
+              </div>
             </div>
 
-            <div class="text-right">
-              <button class="btn btn-success">
-                <%= _t('Order') %>
-              </button>
-            </div>
           </form>
         </div>
       </div>
@@ -177,8 +195,10 @@ card.addEventListener('change', function(event) {
   var displayError = document.getElementById('card-errors');
   if (event.error) {
     displayError.textContent = event.error.message;
+    displayError.setAttribute('class', 'd-block alert alert-danger');
   } else {
     displayError.textContent = '';
+    displayError.setAttribute('class', 'd-none');
   }
 });
 
@@ -186,18 +206,33 @@ card.addEventListener('change', function(event) {
 var form = document.getElementById('payment-form');
 form.addEventListener('submit', function(event) {
   event.preventDefault();
+  loading(true);
 
   stripe.createToken(card).then(function(result) {
     if (result.error) {
       // Inform the customer that there was an error.
       var errorElement = document.getElementById('card-errors');
       errorElement.textContent = result.error.message;
+      errorElement.setAttribute('class', 'd-block alert alert-danger');
+      loading(false);
     } else {
       // Send the token to your server.
       stripeTokenHandler(result.token);
     }
   });
 });
+
+function loading (state) {
+  var button = document.getElementById('order-button');
+  if (state) {
+    button.setAttribute('disabled', state);
+    button.textContent = '<%= _t('Please wait...') %>';
+    // button.setAttribute('class', 'btn btn-success btn-lg');
+  } else {
+    button.textContent = '<%= _t('Order') %>';
+    button.removeAttribute('disabled');
+  }
+}
 
 function stripeTokenHandler(token) {
   // Insert the token ID into the form so it gets submitted to the server

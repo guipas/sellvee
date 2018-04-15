@@ -3,6 +3,7 @@
 const path = require('path');
 
 module.exports = {
+  env : process.env.NODE_ENV,
   url : `http://localhost:3000`,
   name : `Shop`,
   contactEmail : null,

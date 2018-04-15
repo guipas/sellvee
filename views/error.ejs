@@ -1,3 +1,24 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<%- include('./partials/header') %>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+      <div class="alert alert-danger">
+        <%= message %>
+      </div>
+      <div class="">
+        <a id="back" href="#" class="btn btn-secondary">&larr; back</a>
+      </div>
+      <%= error.status %>
+      <pre><%= error.stack %></pre>
+    </div>
+  </div>
+</div>
+<%- include('./partials/footer') %>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#back').on('click', function (e) {
+      e.preventDefault();
+      window.history.back();
+    });
+  });
+</script>
