@@ -130,7 +130,7 @@ module.exports = config => {
     await storage.setItem(key, order);
 
     log(`Download autorization granted, sending file...`);
-    return res.sendFile(product.file);
+    return res.download(product.file);
   }));
 
   return router;
