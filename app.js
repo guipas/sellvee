@@ -45,7 +45,7 @@ module.exports = (userConfig = {}) => {
   });
 
   storage.init({
-    dir: path.join(__dirname, 'persist'),
+    dir: config.dataDir,
     stringify: JSON.stringify,
     parse: JSON.parse,
     encoding: 'utf8',
@@ -55,7 +55,7 @@ module.exports = (userConfig = {}) => {
     ttl: false, // ttl, can be true for 24h default or a number in MILLISECONDS
   })
   .then(() => {
-    console.log('Storage inited');
+    console.log('Storage inited : ', config.dataDir);
     app.use('/', index(config));
     // catch 404 and forward to error handler
     app.use((req, res, next) => {

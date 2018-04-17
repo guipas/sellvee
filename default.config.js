@@ -5,6 +5,7 @@ const path = require('path');
 module.exports = {
   env : process.env.NODE_ENV,
   url : `http://localhost:3000`,
+  dataDir : path.join(__dirname, 'persist'),
   name : `Shop`,
   contactEmail : null,
   currency : `us`, // default stripe currency for products
