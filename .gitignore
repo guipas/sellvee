@@ -30,6 +30,7 @@ node_modules
 npm-debug.log
 
 products.js
-files/**
 config.js
 persist/**
+
+/server.jss

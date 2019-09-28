@@ -3,12 +3,12 @@
 const path = require('path');
 
 module.exports = {
-  env : process.env.NODE_ENV,
+  env : process.env.NODE_ENV || 'production',
   url : `http://localhost:3000`,
   dataDir : path.join(__dirname, 'persist'),
   name : `Shop`,
   contactEmail : null,
-  currency : `us`, // default stripe currency for products
+  currency : `usd`, // default stripe currency for products
   maxDownloads : 3,
   maxDownloadDelay : 24 * 3600,
   views : path.join(__dirname, 'views'),
@@ -27,16 +27,7 @@ module.exports = {
         textBody : ({ link }) => `Thank you for your order, click on the following link to download it : : ${link}`,
       },
     },
-    transport : null,
-    // transport : {
-    //   host: 'smtp.ethereal.email',
-    //   port: 587,
-    //   secure: false, // true for 465, false for other ports
-    //   auth: {
-    //       user: ``,
-    //       pass: ``,
-    //   },
-    // },
+    mailer: process.env.NODE_ENV === 'production' ? 'SendGrid' : 'Dev',
   },
   products : [
     // {

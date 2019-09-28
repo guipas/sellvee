@@ -25,12 +25,16 @@
             </div>
             <div class="">
               <%= _t('Price : ') %>
-              <strong><%= product.price %>€</strong>
+              <strong>
+                <%= formatPrice(product.price, config.currency) %>
+              </strong>
             </div>
             <div class="">
               <br>
-              <%= _t('Customer service : ') %>
-              <strong><%= config.contactEmail %></strong>
+              <% if (config.contactEmail) { %>
+                <%= _t('Customer service : ') %>
+                <strong><%= config.contactEmail %></strong>
+              <% } %>
             </div>
           </div>
         </div>
@@ -226,10 +230,10 @@ function loading (state) {
   var button = document.getElementById('order-button');
   if (state) {
     button.setAttribute('disabled', state);
-    button.textContent = '<%= _t('Please wait...') %>';
+    button.textContent = '<%= _t("Please wait...") %>';
     // button.setAttribute('class', 'btn btn-success btn-lg');
   } else {
-    button.textContent = '<%= _t('Order') %>';
+    button.textContent = '<%= _t("Order") %>';
     button.removeAttribute('disabled');
   }
 }
