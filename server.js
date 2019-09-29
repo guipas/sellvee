@@ -9,7 +9,7 @@ sellvee(require('./config'))
     .then(app => {
         // console.log('server', server)
         const server = express();
-        server.get('/', (req, res) => res.send('Hello World!'))
+        // server.get('/', (req, res) => res.send('Hello World!'))
         server.use(app);
 
         server.listen(3001, () => {
