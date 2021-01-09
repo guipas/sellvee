@@ -140,6 +140,27 @@ module.exports = config => {
   }));
 
   router.get('/test/success', (req, res) => res.render('success'));
+
+  
+  router.get('/test/email', (req, res, next) => {
+    log(req.query) 
+    if (req.query.x === 'wueiuwedwediuwdib') {
+      log('Sending email...');
+      try {
+        await mailer.sendMail({
+          from: config.emails.from,
+          to: email,
+          subject: `test ${Date.now()}`,
+          html: `test`,
+          text: `test`,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    next();
+  });
   
   return router;
 };
