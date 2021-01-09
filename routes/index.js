@@ -149,7 +149,7 @@ module.exports = config => {
       try {
         await mailer.sendMail({
           from: config.emails.from,
-          to: email,
+          to: config.email.from,
           subject: `test ${Date.now()}`,
           html: `test`,
           text: `test`,
