@@ -80,13 +80,17 @@ module.exports = config => {
     const link = `${config.url}/download/${id}/${downloadToken}`;
     
     log('Sending email...');
-    await mailer.sendMail({
-      from: config.emails.from,
-      to: email,
-      subject: typeof config.emails.templates.order.subject === `function` ? config.emails.templates.order.subject({ link }) :  config.emails.templates.order.subject,
-      html: typeof config.emails.templates.order.htmlBody === `function` ?   config.emails.templates.order.htmlBody({ link }) : config.emails.templates.order.htmlBody,
-      text: typeof config.emails.templates.order.textBody === `function` ?   config.emails.templates.order.textBody({ link }) : config.emails.templates.order.textBody,
-    });
+    try {
+      await mailer.sendMail({
+        from: config.emails.from,
+        to: email,
+        subject: typeof config.emails.templates.order.subject === `function` ? config.emails.templates.order.subject({ link }) :  config.emails.templates.order.subject,
+        html: typeof config.emails.templates.order.htmlBody === `function` ?   config.emails.templates.order.htmlBody({ link }) : config.emails.templates.order.htmlBody,
+        text: typeof config.emails.templates.order.textBody === `function` ?   config.emails.templates.order.textBody({ link }) : config.emails.templates.order.textBody,
+      });
+    } catch (e) {
+      console.error(e);
+    }
     
     res.render('success');
   }));
